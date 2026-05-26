@@ -92,6 +92,7 @@ func PurlDPKGAnnotationPackage() *extractor.Package {
 			Justification:   vex.ComponentNotPresent,
 			MatchesAllVulns: true,
 		}},
+		ParentIDs: map[string]bool{},
 	}
 }
 
@@ -1668,6 +1669,10 @@ func TestScanResultToProtoAndBack(t *testing.T) {
 			}
 
 			gotInv := proto.InventoryToStruct(invProto)
+			// Ignore package ID fields because it is randomly generated.
+			for _, pkg := range gotInv.Packages {
+				pkg.ID = ""
+			}
 			if diff := cmp.Diff(tc.res.Inventory, *gotInv, opts...); diff != "" {
 				t.Errorf("proto.InventoryToStruct(%v) returned unexpected diff (-want +got):\n%s", invProto, diff)
 			}
